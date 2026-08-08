@@ -55,18 +55,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable || true
 
-      - name: Execute Lighthouse CI Audit
-        id: lhci
+      - name: Collect Lighthouse Audit Reports
+        id: lhci_collect
         env:
           LHCI_TARGET_URL: ${{ github.event.inputs.target_url || 'https://mogi.vn' }}
           LHCI_RUNS: ${{ github.event.inputs.number_of_runs || '3' }}
           AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
-          LHCI_SERVER_BASE_URL: ${{ secrets.LHCI_SERVER_BASE_URL }}
-          LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
         run: |
           mkdir -p .lighthouseci
-          npx @lhci/cli autorun --config=./lighthouserc.js || true
+          npx @lhci/cli collect --config=./lighthouserc.js
+
+      - name: Evaluate Lighthouse Assertions
+        run: npx @lhci/cli assert --config=./lighthouserc.js || true
+
+      - name: Upload Audit Reports to Render LHCI Server
+        env:
+          LHCI_SERVER_BASE_URL: ${{ secrets.LHCI_SERVER_BASE_URL }}
+          LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
+        run: npx @lhci/cli upload --config=./lighthouserc.js || true
 
       - name: Deploy Live Reports to GitHub Pages (Historical Tracking)
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
