@@ -36,9 +36,15 @@ module.exports = {
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
       },
     },
-    upload: {
-      target: 'filesystem',
-      outputDir: './.lighthouseci',
-    },
+    upload: process.env.LHCI_SERVER_BASE_URL
+      ? {
+          target: 'lhci',
+          serverBaseUrl: process.env.LHCI_SERVER_BASE_URL,
+          token: process.env.LHCI_TOKEN,
+        }
+      : {
+          target: 'filesystem',
+          outputDir: './.lighthouseci',
+        },
   },
 };

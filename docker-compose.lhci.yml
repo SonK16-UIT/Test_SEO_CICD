@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  lhci-db:
+    image: postgres:15-alpine
+    container_name: lhci-db
+    environment:
+      POSTGRES_DB: lhci
+      POSTGRES_USER: lhci
+      POSTGRES_PASSWORD: lhci_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - lhci-db-data:/var/lib/postgresql/data
+    restart: always
+
+  lhci-server:
+    image: patrickhulce/lhci-server:latest
+    container_name: lhci-server
+    ports:
+      - "9001:9001"
+    environment:
+      LHCI_STORAGE__SQL_DIALECT: postgres
+      LHCI_STORAGE__SQL_CONNECTION_STRING: postgresql://lhci:lhci_password@lhci-db:5432/lhci
+    depends_on:
+      - lhci-db
+    restart: always
+
+volumes:
+  lhci-db-data:
