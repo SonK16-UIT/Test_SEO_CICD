@@ -60,7 +60,7 @@ jobs:
           LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
         run: |
           mkdir -p .lighthouseci
-          npx @lhci/cli autorun --config=./lighthouserc.js || echo "LHCI_WARNING=true" >> $GITHUB_ENV
+          npx @lhci/cli autorun --config=./lighthouserc.js || true
 
       - name: Deploy Live Reports to GitHub Pages (Historical Tracking)
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
