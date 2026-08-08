@@ -10,7 +10,9 @@
     "extract-approved": "node src/recon/extractApprovedTasks.js",
     "hitl-server": "node src/hitl/server.js",
     "lint": "eslint \"**/*.{js,ts}\" --quiet",
-    "test:lighthouse": "npx playwright test tests/seo/lighthouse.spec.ts --project=chromium"
+    "test:lighthouse": "npx playwright test tests/seo/lighthouse.spec.ts --project=chromium",
+    "lhci:server": "node src/lhci/server.js",
+    "lhci:wizard": "npx @lhci/cli wizard --serverBaseUrl=http://localhost:9001"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +20,7 @@
   "description": "",
   "devDependencies": {
     "@faker-js/faker": "^10.5.0",
+    "@lhci/server": "^0.15.1",
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.1.2",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
