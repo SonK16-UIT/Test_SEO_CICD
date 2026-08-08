@@ -1,6 +1,6 @@
 /**
- * Clean Production Lighthouse CI Server
- * Reads tokens from environment variables (process.env.LHCI_BUILD_TOKEN & process.env.LHCI_ADMIN_TOKEN).
+ * Zero-Dependency Lighthouse CI Server (using SQLite with multi-token support)
+ * Accepts both TOKEN_1 (5bb66e05-ac79-48cc-821e-3386cadf4e1c) and TOKEN_2 (a1987c4c-257d-4c8c-b622-b8e8224ee8a0).
  */
 const { createServer } = require('@lhci/server');
 const path = require('path');
@@ -8,10 +8,11 @@ const path = require('path');
 const dbPath = path.resolve(__dirname, '../../lhci-db.sqlite');
 const port = process.env.PORT || 9001;
 
-const buildToken = process.env.LHCI_BUILD_TOKEN || '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
-const adminToken = process.env.LHCI_ADMIN_TOKEN || '53807583ee4af9454e596001d60aac7a3282be0d08fbb97a399f5c4659074bfe';
+const TOKEN_1 = '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
+const TOKEN_2 = 'a1987c4c-257d-4c8c-b622-b8e8224ee8a0';
+const ADMIN_TOKEN = '53807583ee4af9454e596001d60aac7a3282be0d08fbb97a399f5c4659074bfe';
 
-console.log('[LHCI Server] Initializing database server...');
+console.log('[LHCI Server] Initializing database and checking server port...');
 
 createServer({
   port: parseInt(port, 10),
@@ -22,30 +23,54 @@ createServer({
   },
 })
   .then(async ({ port, storageMethod }) => {
-    console.log(`🚀 LHCI Dashboard running on port: ${port}`);
+    console.log(`\n======================================================`);
+    console.log(`🚀 Lighthouse CI Dashboard live at port: ${port}`);
+    console.log(`📁 SQLite Database stored at: ${dbPath}`);
+
     try {
       const sequelize = storageMethod._sequelize.sequelize;
       const projects = await storageMethod.getProjects();
-      let project = projects.find(p => p.name === 'Test_SEO_CICD');
-      if (!project) {
-        project = await storageMethod.createProject({
+      
+      // Seed Primary Project for TOKEN_1
+      let project1 = projects.find(p => p.name === 'Test_SEO_CICD');
+      if (!project1) {
+        project1 = await storageMethod.createProject({
           name: 'Test_SEO_CICD',
           externalUrl: 'https://mogi.vn',
           baseBranch: 'main',
         });
       }
       await sequelize.query(
-        `UPDATE projects SET token = '${buildToken}', adminToken = '${adminToken}', baseBranch = 'main'`,
+        `UPDATE projects SET token = '${TOKEN_1}', adminToken = '${ADMIN_TOKEN}', baseBranch = 'main' WHERE id = '${project1.id}'`,
         { type: sequelize.QueryTypes.UPDATE }
       );
-      console.log(`✅ Synced LHCI project "${project.name}" with environment tokens.`);
+
+      // Seed Secondary Project for TOKEN_2
+      let project2 = projects.find(p => p.name === 'Test_SEO_CICD_Alt');
+      if (!project2) {
+        project2 = await storageMethod.createProject({
+          name: 'Test_SEO_CICD_Alt',
+          externalUrl: 'https://mogi.vn',
+          baseBranch: 'main',
+        });
+      }
+      await sequelize.query(
+        `UPDATE projects SET token = '${TOKEN_2}', adminToken = '${ADMIN_TOKEN}', baseBranch = 'main' WHERE id = '${project2.id}'`,
+        { type: sequelize.QueryTypes.UPDATE }
+      );
+
+      console.log(`✅ LHCI Multi-Token Active: [${TOKEN_1}] and [${TOKEN_2}]`);
     } catch (err) {
-      console.error('[LHCI Seed Warning]', err.message);
+      console.error('[LHCI Seed Error]', err);
     }
+    console.log(`======================================================\n`);
   })
   .catch(err => {
     if (err.code === 'EADDRINUSE') {
-      console.log(`ℹ️ Server running on port ${port}`);
+      console.log(`\n======================================================`);
+      console.log(`ℹ️ Lighthouse CI Server is ALREADY RUNNING on port ${port}!`);
+      console.log(`👉 Open http://localhost:${port} in your browser.`);
+      console.log(`======================================================\n`);
     } else {
       console.error('[LHCI Server Error]', err);
     }
