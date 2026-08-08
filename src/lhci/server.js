@@ -35,9 +35,8 @@ createServer({
           baseBranch: 'main',
         });
       }
-      await storageMethod._sequelize.projectModel.update(
-        { token: FIXED_TOKEN, baseBranch: 'main' },
-        { where: { id: project.id } }
+      await storageMethod._sequelize.sequelize.query(
+        `UPDATE projects SET token = '${FIXED_TOKEN}' WHERE id = '${project.id}'`
       );
       console.log(`✅ LHCI project "Test_SEO_CICD" active with fixed token: ${FIXED_TOKEN}`);
     } catch (err) {
