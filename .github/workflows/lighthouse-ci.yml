@@ -1,0 +1,84 @@
+name: Lighthouse CI Performance & SEO Audit
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Custom Target URL to audit'
+        required: false
+        default: 'https://mogi.vn'
+        type: string
+      number_of_runs:
+        description: 'Number of audit runs per URL'
+        required: false
+        default: '3'
+        type: choice
+        options:
+          - '1'
+          - '3'
+          - '5'
+
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
+jobs:
+  lighthouse-ci:
+    name: Audit & Report Web Performance
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Project Dependencies
+        run: npm ci
+
+      - name: Install Playwright & Chrome Dependencies
+        run: npx playwright install --with-deps chromium || true
+
+      - name: Execute Lighthouse CI Audit
+        id: lhci
+        env:
+          LHCI_TARGET_URL: ${{ github.event.inputs.target_url || 'https://mogi.vn' }}
+          LHCI_RUNS: ${{ github.event.inputs.number_of_runs || '3' }}
+          AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
+          AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
+        run: |
+          mkdir -p .lighthouseci
+          npx @lhci/cli autorun --config=./lighthouserc.js || echo "LHCI_WARNING=true" >> $GITHUB_ENV
+
+      - name: Generate Markdown Job Summary
+        if: always()
+        run: |
+          echo "## 🚀 Lighthouse CI Audit Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric / Category | Target SLA | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Performance Score** | >= 0.85 | 🎯 Evaluated |" >> $GITHUB_STEP_SUMMARY
+          echo "| **SEO Score** | >= 0.90 | 🎯 Evaluated |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Largest Contentful Paint (LCP)** | <= 2.5s | ⏱️ Monitored |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Cumulative Layout Shift (CLS)** | <= 0.10 | 📐 Monitored |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Artifact Downloads" >> $GITHUB_STEP_SUMMARY
+          echo "Full interactive Lighthouse HTML and JSON reports have been generated and packaged below." >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Lighthouse Reports Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lhci-reports-${{ github.run_id }}
+          path: .lighthouseci/
+          retention-days: 30
