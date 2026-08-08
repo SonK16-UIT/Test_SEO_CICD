@@ -1,16 +1,38 @@
 /**
  * Production Lighthouse CI Server with Custom Dark Mode Theme
- * Automatically syncs project 'Test_SEO_CICD' with token '5bb66e05-ac79-48cc-821e-3386cadf4e1c'.
+ * - Uses PostgreSQL on Render (DATABASE_URL env var)
+ * - Falls back to SQLite for local development
+ * - Seeds Test_SEO_CICD (commit tracking) and Test_SEO_Manual (manual runs)
  */
 const { createApp } = require('@lhci/server/src/server.js');
 const http = require('http');
 const path = require('path');
 
-const dbPath = path.resolve(__dirname, '../../lhci-db.sqlite');
 const port = process.env.PORT || 9001;
+const DATABASE_URL = process.env.DATABASE_URL;
 
-const BUILD_TOKEN = '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
-const ADMIN_TOKEN = '53807583ee4af9454e596001d60aac7a3282be0d08fbb97a399f5c4659074bfe';
+// Tokens
+const LHCI_CICD_TOKEN   = '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
+const LHCI_MANUAL_TOKEN = 'b4c49f2e-7152-4102-b60c-4316b7d79874';
+const ADMIN_TOKEN       = '53807583ee4af9454e596001d60aac7a3282be0d08fbb97a399f5c4659074bfe';
+
+// Storage config — PostgreSQL in prod, SQLite locally
+const storageConfig = DATABASE_URL
+  ? {
+      storageMethod: 'sql',
+      sqlDialect: 'postgres',
+      sqlConnectionUrl: DATABASE_URL,
+      sqlDialectOptions: {
+        ssl: { rejectUnauthorized: false }, // Required for Render PostgreSQL
+      },
+    }
+  : {
+      storageMethod: 'sql',
+      sqlDialect: 'sqlite',
+      sqlDatabasePath: path.resolve(__dirname, '../../lhci-db.sqlite'),
+    };
+
+console.log(`[LHCI Server] Storage: ${DATABASE_URL ? 'PostgreSQL (Render)' : 'SQLite (local)'}`);
 
 // Modern Sleek Dark Mode Theme CSS Injection
 const DARK_MODE_CSS = `
@@ -63,15 +85,37 @@ const DARK_MODE_CSS = `
 </style>
 `;
 
-console.log('[LHCI Server] Initializing database server with Dark Mode...');
+// Seed a single project (only creates if missing, only updates its own token)
+async function seedProject(storageMethod, { name, slug, token }) {
+  const projects = await storageMethod.getProjects();
+  let project = projects.find(p => p.name === name);
+  if (!project) {
+    project = await storageMethod.createProject({
+      name,
+      slug,
+      externalUrl: 'https://mogi.vn',
+      baseBranch: 'main',
+    });
+    console.log(`✅ Created project "${name}"`);
+  } else {
+    console.log(`ℹ️  Project "${name}" already exists — skipping creation`);
+  }
+
+  // Update only this project's token (not all projects)
+  const sequelize = storageMethod._sequelize.sequelize;
+  await sequelize.query(
+    `UPDATE projects SET token = :token, adminToken = :admin WHERE id = :id`,
+    {
+      replacements: { token, admin: ADMIN_TOKEN, id: project.id },
+      type: sequelize.QueryTypes.UPDATE,
+    }
+  );
+  console.log(`🔑 Token synced for "${name}": ${token}`);
+}
 
 createApp({
   port: parseInt(port, 10),
-  storage: {
-    storageMethod: 'sql',
-    sqlDialect: 'sqlite',
-    sqlDatabasePath: dbPath,
-  },
+  storage: storageConfig,
 })
   .then(async ({ app, storageMethod }) => {
     // Inject Dark Mode CSS middleware
@@ -93,21 +137,21 @@ createApp({
       console.log(`🚀 LHCI Dashboard running on port: ${port} (Dark Mode Active 🌙)`);
 
       try {
-        const sequelize = storageMethod._sequelize.sequelize;
-        const projects = await storageMethod.getProjects();
-        let project = projects.find(p => p.name === 'Test_SEO_CICD');
-        if (!project) {
-          project = await storageMethod.createProject({
-            name: 'Test_SEO_CICD',
-            externalUrl: 'https://mogi.vn',
-            baseBranch: 'main',
-          });
-        }
-        await sequelize.query(
-          `UPDATE projects SET token = '${BUILD_TOKEN}', adminToken = '${ADMIN_TOKEN}', baseBranch = 'main'`,
-          { type: sequelize.QueryTypes.UPDATE }
-        );
-        console.log(`✅ Synced LHCI project "${project.name}" with token: ${BUILD_TOKEN}`);
+        // Seed Tab 1 — Commit tracking project
+        await seedProject(storageMethod, {
+          name:  'Test_SEO_CICD',
+          slug:  'test-seo-cicd',
+          token: LHCI_CICD_TOKEN,
+        });
+
+        // Seed Tab 2 — Manual run project
+        await seedProject(storageMethod, {
+          name:  'Test_SEO_Manual',
+          slug:  'test-seo-manual',
+          token: LHCI_MANUAL_TOKEN,
+        });
+
+        console.log('🎉 All projects seeded successfully.');
       } catch (err) {
         console.error('[LHCI Seed Error]', err.message);
       }
@@ -115,8 +159,9 @@ createApp({
   })
   .catch(err => {
     if (err.code === 'EADDRINUSE') {
-      console.log(`ℹ️ Server running on port ${port}`);
+      console.log(`ℹ️ Server already running on port ${port}`);
     } else {
       console.error('[LHCI Server Error]', err);
+      process.exit(1);
     }
   });
