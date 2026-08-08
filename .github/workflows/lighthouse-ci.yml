@@ -23,7 +23,7 @@ on:
           - '5'
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   statuses: write
 
@@ -60,6 +60,14 @@ jobs:
           mkdir -p .lighthouseci
           npx @lhci/cli autorun --config=./lighthouserc.js || echo "LHCI_WARNING=true" >> $GITHUB_ENV
 
+      - name: Deploy Live Reports to GitHub Pages (Historical Tracking)
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .lighthouseci
+          target-folder: reports/${{ github.run_id }}
+          clean: false
+
       - name: Generate Markdown Job Summary
         if: always()
         run: |
@@ -72,8 +80,12 @@ jobs:
           echo "| **Largest Contentful Paint (LCP)** | <= 2.5s | ⏱️ Monitored |" >> $GITHUB_STEP_SUMMARY
           echo "| **Cumulative Layout Shift (CLS)** | <= 0.10 | 📐 Monitored |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🌐 Live Interactive Report Link" >> $GITHUB_STEP_SUMMARY
+          echo "You can preview the live interactive Lighthouse HTML report at:" >> $GITHUB_STEP_SUMMARY
+          echo "👉 https://SonK16-UIT.github.io/Test_SEO_CICD/reports/${{ github.run_id }}/" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📦 Artifact Downloads" >> $GITHUB_STEP_SUMMARY
-          echo "Full interactive Lighthouse HTML and JSON reports have been generated and packaged below." >> $GITHUB_STEP_SUMMARY
+          echo "Full raw `.html` and `.json` audit files are also available in the workflow download section below." >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Lighthouse Reports Artifact
         uses: actions/upload-artifact@v4
