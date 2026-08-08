@@ -93,7 +93,7 @@ jobs:
           echo "👉 https://SonK16-UIT.github.io/Test_SEO_CICD/reports/${{ github.run_id }}/" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📦 Artifact Downloads" >> $GITHUB_STEP_SUMMARY
-          echo "Full raw `.html` and `.json` audit files are also available in the workflow download section below." >> $GITHUB_STEP_SUMMARY
+          echo "Full raw HTML and JSON audit files are also available in the workflow download section below." >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Lighthouse Reports Artifact
         uses: actions/upload-artifact@v4
