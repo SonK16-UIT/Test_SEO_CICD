@@ -2,10 +2,6 @@
 name: Lighthouse CI Performance & SEO Audit
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
     inputs:
       target_url:
@@ -66,22 +62,43 @@ jobs:
           mkdir -p .lighthouseci
           npx @lhci/cli collect --config=./lighthouserc.js
 
+      - name: Debug & Inspect Collected Files
+        run: |
+          echo "=================== LHCI DEBUG INSPECTION ==================="
+          if [ -d ".lighthouseci" ]; then
+            echo "📁 .lighthouseci directory EXISTS."
+            echo "📄 Report files generated:"
+            ls -la .lighthouseci/
+            echo "📊 Total files generated: $(ls -1 .lighthouseci/ | wc -l)"
+          else
+            echo "❌ ERROR: .lighthouseci directory DOES NOT EXIST!"
+          fi
+          echo "============================================================"
+
       - name: Evaluate Lighthouse Assertions
         run: npx @lhci/cli assert --config=./lighthouserc.js || true
+
+      - name: Deploy Live Reports to GitHub Pages (Historical Tracking)
+        if: always()
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .lighthouseci
+          target-folder: reports/${{ github.run_id }}
+          clean: false
+
+      - name: Upload Lighthouse Reports Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lhci-reports-${{ github.run_id }}
+          path: .lighthouseci/
+          retention-days: 30
 
       - name: Upload Audit Reports to Render LHCI Server
         env:
           LHCI_SERVER_BASE_URL: ${{ secrets.LHCI_SERVER_BASE_URL }}
           LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
         run: npx @lhci/cli upload --config=./lighthouserc.js || true
-
-      - name: Deploy Live Reports to GitHub Pages (Historical Tracking)
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: .lighthouseci
-          target-folder: reports/${{ github.run_id }}
-          clean: false
 
       - name: Generate Markdown Job Summary
         if: always()
@@ -101,11 +118,3 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📦 Artifact Downloads" >> $GITHUB_STEP_SUMMARY
           echo "Full raw HTML and JSON audit files are also available in the workflow download section below." >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload Lighthouse Reports Artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lhci-reports-${{ github.run_id }}
-          path: .lighthouseci/
-          retention-days: 30
