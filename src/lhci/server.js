@@ -1,14 +1,15 @@
 /**
- * Zero-Dependency Lighthouse CI Server (using SQLite with fixed token auto-seed)
- * Ensures Admin Token 'BXntTdUd1gMWP8OpmEsy13ASeqWDr1MaeR5xHBga' is always active across restarts.
+ * Zero-Dependency Lighthouse CI Server (using SQLite with fixed tokens auto-seed)
+ * Ensures Admin Token '53807583ee4af9454e596001d60aac7a3282be0d08fbb97a399f5c4659074bfe'
+ * and Build Token '5bb66e05-ac79-48cc-821e-3386cadf4e1c' are active across all restarts.
  */
 const { createServer } = require('@lhci/server');
 const path = require('path');
 
 const dbPath = path.resolve(__dirname, '../../lhci-db.sqlite');
 const port = process.env.PORT || 9001;
-const FIXED_TOKEN = '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
-const ADMIN_TOKEN = 'BXntTdUd1gMWP8OpmEsy13ASeqWDr1MaeR5xHBga';
+const BUILD_TOKEN = '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
+const ADMIN_TOKEN = '53807583ee4af9454e596001d60aac7a3282be0d08fbb97a399f5c4659074bfe';
 
 console.log('[LHCI Server] Initializing database and checking server port...');
 
@@ -26,6 +27,7 @@ createServer({
     console.log(`📁 SQLite Database stored at: ${dbPath}`);
 
     try {
+      const sequelize = storageMethod._sequelize.sequelize;
       const projects = await storageMethod.getProjects();
       let project = projects.find(p => p.name === 'Test_SEO_CICD');
       if (!project) {
@@ -35,12 +37,12 @@ createServer({
           baseBranch: 'main',
         });
       }
-      const sequelize = storageMethod._sequelize.sequelize;
       await sequelize.query(
-        `UPDATE projects SET token = '${FIXED_TOKEN}', adminToken = '${ADMIN_TOKEN}', baseBranch = 'main'`,
+        `UPDATE projects SET token = '${BUILD_TOKEN}', adminToken = '${ADMIN_TOKEN}', baseBranch = 'main'`,
         { type: sequelize.QueryTypes.UPDATE }
       );
-      console.log(`✅ LHCI project synced with Admin Token: ${ADMIN_TOKEN}`);
+      console.log(`✅ Synced Build Token: ${BUILD_TOKEN}`);
+      console.log(`✅ Synced Admin Token: ${ADMIN_TOKEN}`);
     } catch (err) {
       console.error('[LHCI Seed Error]', err);
     }
