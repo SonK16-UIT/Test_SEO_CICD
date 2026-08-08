@@ -101,12 +101,12 @@ async function seedProject(storageMethod, { name, slug, token }) {
     console.log(`ℹ️  Project "${name}" already exists — skipping creation`);
   }
 
-  // Update only this project's token (not all projects)
+  // Update only this project's build token (adminToken column does not exist in PostgreSQL schema)
   const sequelize = storageMethod._sequelize.sequelize;
   await sequelize.query(
-    `UPDATE projects SET token = :token, adminToken = :admin WHERE id = :id`,
+    `UPDATE projects SET token = :token WHERE id = :id`,
     {
-      replacements: { token, admin: ADMIN_TOKEN, id: project.id },
+      replacements: { token, id: project.id },
       type: sequelize.QueryTypes.UPDATE,
     }
   );
