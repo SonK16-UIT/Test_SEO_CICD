@@ -78,11 +78,19 @@ jobs:
       - name: Evaluate Lighthouse Assertions
         run: npx @lhci/cli assert --config=./lighthouserc.js || true
 
+      - name: Backup Report Files Before Deploy
+        run: |
+          echo "📦 Backing up .lighthouseci/ to /tmp/lhci-backup/ before GitHub Pages deploy..."
+          mkdir -p /tmp/lhci-backup
+          cp -r .lighthouseci/. /tmp/lhci-backup/
+          echo "✅ Backup complete. Files in backup:"
+          ls -la /tmp/lhci-backup/
+
       - name: Deploy Live Reports to GitHub Pages (Historical Tracking)
         if: always()
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: .lighthouseci
+          folder: /tmp/lhci-backup
           target-folder: reports/${{ github.run_id }}
           clean: false
 
@@ -91,14 +99,17 @@ jobs:
         if: always()
         with:
           name: lhci-reports-${{ github.run_id }}
-          path: .lighthouseci/
+          path: /tmp/lhci-backup/
           retention-days: 30
 
       - name: Upload Audit Reports to Render LHCI Server
         env:
           LHCI_SERVER_BASE_URL: ${{ secrets.LHCI_SERVER_BASE_URL }}
           LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
-        run: npx @lhci/cli upload --config=./lighthouserc.js || true
+        run: |
+          # Trim any trailing whitespace/newlines from token before upload
+          export LHCI_TOKEN=$(echo -n "$LHCI_TOKEN" | tr -d '[:space:]')
+          npx @lhci/cli upload --config=./lighthouserc.js || true
 
       - name: Generate Markdown Job Summary
         if: always()
