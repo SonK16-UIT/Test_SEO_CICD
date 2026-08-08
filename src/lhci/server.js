@@ -24,7 +24,6 @@ createServer({
     console.log(`🚀 Lighthouse CI Dashboard live at port: ${port}`);
     console.log(`📁 SQLite Database stored at: ${dbPath}`);
 
-    // Auto-seed project with fixed token so token never gets lost on restart
     try {
       const projects = await storageMethod.getProjects();
       let project = projects.find(p => p.name === 'Test_SEO_CICD');
@@ -35,12 +34,14 @@ createServer({
           baseBranch: 'main',
         });
       }
-      await storageMethod._sequelize.sequelize.query(
-        `UPDATE projects SET token = '${FIXED_TOKEN}' WHERE id = '${project.id}'`
+      const sequelize = storageMethod._sequelize.sequelize;
+      await sequelize.query(
+        `UPDATE projects SET token = '${FIXED_TOKEN}', baseBranch = 'main' WHERE id = '${project.id}'`,
+        { type: sequelize.QueryTypes.UPDATE }
       );
-      console.log(`✅ LHCI project "Test_SEO_CICD" active with fixed token: ${FIXED_TOKEN}`);
+      console.log(`✅ LHCI project "Test_SEO_CICD" synced with token: ${FIXED_TOKEN}`);
     } catch (err) {
-      console.warn('[LHCI Seed Warning]', err.message);
+      console.error('[LHCI Seed Error]', err);
     }
     console.log(`======================================================\n`);
   })
