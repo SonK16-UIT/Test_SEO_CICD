@@ -1,12 +1,13 @@
 /**
- * Zero-Dependency Lighthouse CI Server (using SQLite with auto-seed)
- * Runs locally or on Render with persistent fixed token registration.
+ * Zero-Dependency Lighthouse CI Server (using SQLite with fixed token auto-seed)
+ * Ensures fixed token '5bb66e05-ac79-48cc-821e-3386cadf4e1c' is always active across restarts.
  */
 const { createServer } = require('@lhci/server');
 const path = require('path');
 
 const dbPath = path.resolve(__dirname, '../../lhci-db.sqlite');
 const port = process.env.PORT || 9001;
+const FIXED_TOKEN = '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
 
 console.log('[LHCI Server] Initializing database and checking server port...');
 
@@ -20,7 +21,7 @@ createServer({
 })
   .then(async ({ port, storageMethod }) => {
     console.log(`\n======================================================`);
-    console.log(`🚀 Lighthouse CI Dashboard live at: http://localhost:${port}`);
+    console.log(`🚀 Lighthouse CI Dashboard live at port: ${port}`);
     console.log(`📁 SQLite Database stored at: ${dbPath}`);
 
     // Auto-seed project with fixed token so token never gets lost on restart
@@ -32,11 +33,16 @@ createServer({
           name: 'Test_SEO_CICD',
           externalUrl: 'https://mogi.vn',
           baseBranch: 'main',
-          token: 'a1987c4c-257d-4c8c-b622-b8e8224ee8a0',
         });
-        console.log(`✅ Auto-seeded LHCI project "Test_SEO_CICD" with fixed token!`);
+        await storageMethod._sequelize.query(
+          `UPDATE projects SET token = '${FIXED_TOKEN}' WHERE id = '${project.id}'`
+        );
+        console.log(`✅ Auto-seeded project "Test_SEO_CICD" with fixed token: ${FIXED_TOKEN}`);
       } else {
-        console.log(`✅ LHCI project "Test_SEO_CICD" ready.`);
+        await storageMethod._sequelize.query(
+          `UPDATE projects SET token = '${FIXED_TOKEN}' WHERE id = '${project.id}'`
+        );
+        console.log(`✅ LHCI project "Test_SEO_CICD" ready with fixed token: ${FIXED_TOKEN}`);
       }
     } catch (err) {
       console.warn('[LHCI Seed Warning]', err.message);
