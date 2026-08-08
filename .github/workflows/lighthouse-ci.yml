@@ -50,6 +50,11 @@ jobs:
       - name: Install Playwright & Chrome Dependencies
         run: npx playwright install --with-deps chromium || true
 
+      - name: Install Google Chrome Browser
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable || true
+
       - name: Execute Lighthouse CI Audit
         id: lhci
         env:
