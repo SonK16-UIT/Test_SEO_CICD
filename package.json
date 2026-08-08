@@ -16,8 +16,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "description": "",
+  "engines": {
+    "node": "20.x"
+  },
   "devDependencies": {
     "@faker-js/faker": "^10.5.0",
     "@lhci/server": "^0.15.1",
