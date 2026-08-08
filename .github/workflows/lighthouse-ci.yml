@@ -102,14 +102,28 @@ jobs:
           path: /tmp/lhci-backup/
           retention-days: 30
 
-      - name: Upload Audit Reports to Render LHCI Server
+      # ── Tab 1: Commit Tracking (1 build per Git SHA — 422 on re-run = ignored) ──
+      - name: Upload to Render — Commit Tracking Tab
         env:
           LHCI_SERVER_BASE_URL: ${{ secrets.LHCI_SERVER_BASE_URL }}
           LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
         run: |
-          # Trim any trailing whitespace/newlines from token before upload
           export LHCI_TOKEN=$(echo -n "$LHCI_TOKEN" | tr -d '[:space:]')
           npx @lhci/cli upload --config=./lighthouserc.js || true
+
+      # ── Tab 2: Manual Run Tracking (timestamp hash = never duplicates) ──
+      - name: Upload to Render — Manual Run Tab
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          LHCI_SERVER_BASE_URL: ${{ secrets.LHCI_SERVER_BASE_URL }}
+          LHCI_TOKEN: ${{ secrets.LHCI_TOKEN_MANUAL }}
+        run: |
+          export LHCI_TOKEN=$(echo -n "$LHCI_TOKEN" | tr -d '[:space:]')
+          npx @lhci/cli upload \
+            --config=./lighthouserc.js \
+            --buildContext.gitCommit="manual-$(date +%s)" \
+            --buildContext.commitMessage="Manual run: $(date '+%Y-%m-%d %H:%M UTC')" \
+            || true
 
       - name: Generate Markdown Job Summary
         if: always()
