@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HITL Task Review</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; background: #f7f8fb; color: #111; }
+    h1 { color: #1f4e79; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { padding: 10px 12px; border: 1px solid #d7d7e0; }
+    th { background: #1f4e79; color: #fff; }
+    tr:nth-child(even) { background: #fff; }
+    tr:nth-child(odd) { background: #f3f5f9; }
+    button { padding: 8px 12px; margin-right: 6px; border: none; border-radius: 4px; cursor: pointer; }
+    button.approve { background: #1f8a4a; color: #fff; }
+    button.reject { background: #d64545; color: #fff; }
+    .status { font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>HITL Task Review</h1>
+  <div id="status">Loading tasks...</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Task ID</th>
+        <th>URL</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="tasks"></tbody>
+  </table>
+  <script>
+    const apiBase = '';
+
+    async function loadTasks() {
+      const response = await fetch(apiBase + '/tasks');
+      const tasks = await response.json();
+      const tbody = document.getElementById('tasks');
+      tbody.innerHTML = '';
+      document.getElementById('status').innerText = `Loaded ${tasks.length} task(s)`;
+
+      tasks.forEach((task) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><a href="${task.reportPath || '#'}" target="_blank">${task.taskId}</a></td>
+          <td><a href="${task.url}" target="_blank">${task.url}</a></td>
+          <td class="status">${task.status}</td>
+          <td>
+            <button class="approve" onclick="updateTask('${task.taskId}','APPROVED')">Approve</button>
+            <button class="reject" onclick="updateTask('${task.taskId}','REJECTED')">Reject</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function updateTask(taskId, status) {
+      await fetch(apiBase + `/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, approved: status === 'APPROVED' }),
+      });
+      loadTasks();
+    }
+
+    loadTasks().catch((error) => {
+      document.getElementById('status').innerText = 'Failed to load tasks: ' + error.message;
+    });
+  </script>
+</body>
+</html>

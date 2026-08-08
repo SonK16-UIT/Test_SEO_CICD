@@ -1,0 +1,4 @@
+node_modules/
+pages-exploration/
+storageState.json
+src/recon/explorer.ts

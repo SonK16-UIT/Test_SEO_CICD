@@ -1,0 +1,48 @@
+{
+  "name": "automation_demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "explore": "node src/recon/explorer.js",
+    "pipeline": "node src/recon/reconToHitl.js",
+    "pipeline:validate": "set VALIDATE_AFTER_EXTRACTION=true&& node src/recon/reconToHitl.js",
+    "pipeline:validate:excel": "set VALIDATE_AFTER_EXTRACTION=true&& set EXPORT_EXCEL_DIR=pages-exploration\\extracted\\excel&& node src/recon/reconToHitl.js",
+    "extract-approved": "node src/recon/extractApprovedTasks.js",
+    "hitl-server": "node src/hitl/server.js",
+    "lint": "eslint \"**/*.{js,ts}\" --quiet",
+    "test:lighthouse": "npx playwright test tests/seo/lighthouse.spec.ts --project=chromium"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@faker-js/faker": "^10.5.0",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.1.2",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "cheerio": "^1.2.0",
+    "csp_evaluator": "^1.1.8",
+    "dotenv": "^16.0.0",
+    "eslint": "^8.0.0",
+    "lighthouse": "^11.7.1",
+    "playwright-lighthouse": "^4.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "playwright": "^1.62.1",
+    "playwright-extra": "^4.3.6",
+    "playwright-extra-plugin-stealth": "^0.0.1",
+    "proxy-chain": "^3.0.0",
+    "sqlite3": "^6.0.1",
+    "uuid": "^14.0.1"
+  },
+  "overrides": {
+    "lighthouse": {
+      "csp_evaluator": "1.1.8"
+    }
+  }
+}

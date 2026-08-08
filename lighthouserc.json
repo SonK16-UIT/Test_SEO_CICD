@@ -1,0 +1,15 @@
+{
+  "ci": {
+    "collect": {
+      "url": ["https://mogi.vn/", "https://mogi.vn/mua-nha"],
+      "numberOfRuns": 3
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", {"minScore": 0.85}],
+        "categories:seo": ["error", {"minScore": 0.90}],
+        "largest-contentful-paint": ["error", {"maxNumericValue": 2500}]
+      }
+    }
+  }
+}

@@ -1,0 +1,307 @@
+\documentclass[10pt, letterpaper]{article}
+
+% Packages:
+\usepackage[
+    ignoreheadfoot, % set margins without considering header and footer
+    top=2 cm, % seperation between body and page edge from the top
+    bottom=2 cm, % seperation between body and page edge from the bottom
+    left=2 cm, % seperation between body and page edge from the left
+    right=2 cm, % seperation between body and page edge from the right
+    footskip=1.0 cm, % seperation between body and footer
+]{geometry} % for adjusting page geometry
+\usepackage{titlesec} % for customizing section titles
+\usepackage{tabularx} % for making tables with fixed width columns
+\usepackage{array} % tabularx requires this
+\usepackage[dvipsnames]{xcolor} % for coloring text
+\definecolor{primaryColor}{RGB}{0, 79, 144} % define primary color
+\usepackage{enumitem} % for customizing lists
+\usepackage{fontawesome5} % for using icons
+\usepackage{amsmath} % for math
+\usepackage[
+    pdftitle={Son Truong Huu Truong - CV},
+    pdfauthor={Son Truong Huu Truong},
+    pdfcreator={LaTeX},
+    colorlinks=true,
+    urlcolor=primaryColor
+]{hyperref} % for links, metadata and bookmarks
+\usepackage[pscoord]{eso-pic} % for floating text on the page
+\usepackage{calc} % for calculating lengths
+\usepackage{bookmark} % for bookmarks
+\usepackage{lastpage} % for getting the total number of pages
+\usepackage{changepage} % for one column entries (adjustwidth environment)
+\usepackage{paracol} % for two and three column entries
+\usepackage{ifthen} % for conditional statements
+\usepackage{needspace} % for avoiding page break right after the section title
+\usepackage{iftex} % check if engine is pdflatex, xetex or luatex
+
+% Ensure that generated pdf is machine readable/ATS parsable:
+\ifPDFTeX
+    \input{glyphtounicode}
+    \pdfgentounicode=1
+    \usepackage[utf8]{inputenc}
+    \usepackage{lmodern}
+\fi
+
+% Some settings:
+\AtBeginEnvironment{adjustwidth}{\partopsep0pt} % remove space before adjustwidth environment
+\pagestyle{empty} % no header or footer
+\setcounter{secnumdepth}{0} % no section numbering
+\setlength{\parindent}{0pt} % no indentation
+\setlength{\topskip}{0pt} % no top skip
+\setlength{\columnsep}{0cm} % set column seperation
+\makeatletter
+\let\ps@customFooterStyle\ps@plain % Copy the plain style to customFooterStyle
+\patchcmd{\ps@customFooterStyle}{\thepage}{}{}{} % replace number by desired string
+\makeatother
+\pagestyle{customFooterStyle}
+
+\titleformat{\section}{\needspace{4\baselineskip}\bfseries\large}{}{0pt}{}[\vspace{1pt}\titlerule]
+
+\titlespacing{\section}{
+    -1pt
+}{
+    0.3 cm
+}{
+    0.2 cm
+} % section title spacing
+
+\renewcommand\labelitemi{$\circ$} % custom bullet points
+\newenvironment{highlights}{
+    \begin{itemize}[
+        topsep=0.10 cm,
+        parsep=0.10 cm,
+        partopsep=0pt,
+        itemsep=0pt,
+        leftmargin=0.4 cm + 10pt
+    ]
+}{
+    \end{itemize}
+} % new environment for highlights
+
+\newenvironment{highlightsforbulletentries}{
+    \begin{itemize}[
+        topsep=0.10 cm,
+        parsep=0.10 cm,
+        partopsep=0pt,
+        itemsep=0pt,
+        leftmargin=10pt
+    ]
+}{
+    \end{itemize}
+} % new environment for highlights for bullet entries
+
+\newenvironment{onecolentry}{
+    \begin{adjustwidth}{
+        0.2 cm + 0.00001 cm
+    }{
+        0.2 cm + 0.00001 cm
+    }
+}{
+    \end{adjustwidth}
+} % new environment for one column entries
+
+\newenvironment{twocolentry}[2][]{
+    \onecolentry
+    \def\secondColumn{#2}
+    \setcolumnwidth{\fill, 4.5 cm}
+    \begin{paracol}{2}
+}{
+    \switchcolumn \raggedleft \secondColumn
+    \end{paracol}
+    \endonecolentry
+} % new environment for two column entries
+
+\newenvironment{header}{
+    \setlength{\topsep}{0pt}\par\kern\topsep\centering\linespread{1.5}
+}{
+    \par\kern\topsep
+} % new environment for the header
+
+\newcommand{\placelastupdatedtext}{%
+  \AddToShipoutPictureFG*{%
+    \put(
+        \LenToUnit{\paperwidth-2 cm-0.2 cm+0.05cm},
+        \LenToUnit{\paperheight-1.0 cm}
+    ){\vtop{{\null}\makebox[0pt][c]{
+        
+    }}}%
+  }%
+}%
+
+% save the original href command in a new command:
+\let\hrefWithoutArrow\href
+
+% new command for external links:
+\renewcommand{\href}[2]{\hrefWithoutArrow{#1}{\ifthenelse{\equal{#2}{}}{ }{#2 }\raisebox{.15ex}{\footnotesize \faExternalLink*}}}
+
+
+\begin{document}
+    \newcommand{\AND}{\unskip
+        \cleaders\copy\ANDbox\hskip\wd\ANDbox
+        \ignorespaces
+    }
+    \newsavebox\ANDbox
+    \sbox\ANDbox{}
+
+    \placelastupdatedtext
+    \begin{header}
+        \textbf{\fontsize{24 pt}{24 pt}\selectfont SON TRUONG HUU TRUONG}
+
+        \vspace{0.3 cm}
+
+        \normalsize
+        \mbox{{\color{black}\footnotesize\faMapMarker*}\hspace*{0.13cm}Ho Chi Minh City, Vietnam}%
+        \kern 0.25 cm%
+        \AND%
+        \kern 0.25 cm%
+        \mbox{\hrefWithoutArrow{mailto:sontruonghuu3k@gmail.com}{\color{black}{\footnotesize\faEnvelope[regular]}\hspace*{0.13cm}sontruonghuu3k@gmail.com}}%
+        \kern 0.25 cm%
+        \AND%
+        \kern 0.25 cm%
+        \mbox{\hrefWithoutArrow{tel:+84-70-547-38-39}{\color{black}{\footnotesize\faPhone*}\hspace*{0.13cm}070 547 38 39}}%
+        \kern 0.25 cm%
+        \AND%
+        \kern 0.25 cm%
+    \end{header}
+
+    \vspace{0.3 cm - 0.3 cm}
+
+    \section{Professional Summary}
+    \begin{onecolentry}
+        Results-driven Automation Data Engineer with 3.5+ years of experience architecting data extraction pipelines, automating web performance analysis, and delivering actionable insights from large-scale enterprise applications. Career trajectory evolved from traditional QA into a hybrid data-automation discipline -- leveraging \textbf{Playwright} and \textbf{Python} to systematically crawl, query, and analyze web ecosystems. Adept at translating raw DOM telemetry and API payloads into structured datasets, enabling product teams to pinpoint drop-off points, search-trend anomalies, and performance bottlenecks before they impact end users. Highly detail-oriented, fluent in Agile/Scrum, and committed to bridging the gap between data integrity and user experience.
+    \end{onecolentry}
+
+    \section{Technical Skills}
+    \begin{onecolentry}
+        \textbf{Data Automation \& Extraction:} Playwright, Scrapy, BeautifulSoup, Cypress, Selenium WebDriver \\
+        \textbf{Performance \& Debugging:} Chrome DevTools (Performance Panel, Network Waterfall), API Interception \\
+        \textbf{Languages:} JavaScript / TypeScript, Python, SQL, C\# \\
+        \textbf{Databases \& Infrastructure:} SQL Server, Azure DevOps, GitLab, CI/CD Pipelines \\
+        \textbf{Data Pipelines \& Telemetry:} API Interception, JSON / XLSX Transformation, Postman, Swagger \\
+        \textbf{Analytics \& Optimization:} Workflow Funnel Analysis, Data Migration Validation, Power BI Dashboard Verification \\
+        \textbf{Methodology:} Agile / Scrum, E2E Test Strategy, Regression Analysis, Root-Cause Analysis \\
+    \end{onecolentry}
+
+    \section{Certifications}
+    \begin{onecolentry}
+        \textbf{IELTS Academic 7.0} -- Issued by IDP Education Co., Ltd. (\href{https://drive.google.com/file/d/1eomxCWVVwiQJQ_-r9H2SzRlkqU5rqZF6/view?usp=sharing}{Here})
+    \end{onecolentry}
+    
+    \vspace{0.10 cm}
+    
+    \begin{onecolentry}
+        \textbf{TOEIC 830 (Reading \& Listening)} -- Issued by ETS (\href{https://drive.google.com/file/d/1-eDrBHMYC5UUNTa19ratmCzVeEmv7HYx/view?usp=sharing}{Here})
+    \end{onecolentry}
+
+    \section{Professional Experience}
+
+    % --- PROJECT: WELLCARE ---
+    \begin{twocolentry}{
+        \textit{09/2024 -- Present}}
+        \textbf{Automation Data Engineer}
+
+        \textit{Project: Halliburton -- WellCare (Logix Team)}
+
+        \textit{Tech Stack: Playwright, Python, BeautifulSoup, SQL, Power BI, Postman}
+    \end{twocolentry}
+
+    \vspace{0.10 cm}
+    \begin{onecolentry}
+        \textit{Project Overview: Enterprise alerting platform that monitors well operations in real time, distributes notifications to role-based recipient lists, and integrates Power BI dashboards to visualize alert volume, resolution rates, and recipient engagement metrics.}
+        \begin{highlights}
+            \item Developed automated data-crawling pipelines using Playwright + BeautifulSoup to extract alert metadata, recipient lists, and distribution configurations from role-based screens (Admin, Engineer, Manager, Viewer), replacing manual spot-checks with systematic data harvesting across large paginated datasets.
+            \item Implemented API interception via Playwright route handlers to capture response payloads and evaluate performance characteristics of data-heavy dashboard views, flagging slow-loading endpoints and recommending optimization strategies to the frontend team.
+            \item Captured and compared visual snapshots of Power BI--embedded dashboards and alert management screens across 4 role-based views (Admin, Engineer, Manager, Viewer) using Playwright screenshots, detecting unintended layout shifts and data-rendering anomalies before each release.
+            \item Extracted and cross-referenced API response payloads with SQL queries against the backend database to validate alert-creation and notification workflows, identifying gaps in recipient engagement tracking that led to improvements in the notification delivery pipeline.
+            \item Validated migrated data integrity from the legacy EDM database by programmatically crawling UI grids, exporting rendered records to structured JSON/XLSX, and diffing against source-of-truth datasets -- achieving near-complete data accuracy across pagination boundaries.
+        \end{highlights}
+    \end{onecolentry}
+
+    \vspace{0.3 cm}
+
+    % --- PROJECT: WELLPLAN ---
+    \begin{twocolentry}{
+        \textit{09/2024 -- Present}}
+        \textbf{Automation Data Engineer}
+
+        \textit{Project: Halliburton -- WellPlan}
+
+        \textit{Tech Stack: Playwright, SQL, Swagger}
+    \end{twocolentry}
+
+    \vspace{0.10 cm}
+    \begin{onecolentry}
+        \textit{Project Overview: Advanced engineering application for well-planning that supports Imperial, Metric, and mixed unit systems, covering enquiry data storage, engineering calculations (shear pin, ball drop), and integration with WellPlan charts for Torque \& Drag, Hydraulics, and Swab/Surge analysis.}
+        \begin{highlights}
+            \item Built an API interception framework using Playwright route handlers to dynamically capture and mutate third-party microservice payloads, extracting crash telemetry and exporting structured error matrices to Excel -- significantly reducing developer debugging turnaround time across release cycles.
+            \item Monitored frontend rendering performance for recalculation-heavy workflows using Chrome DevTools and Playwright network interception, identifying heavy-payload bottlenecks and flagging endpoints where large engineering datasets caused noticeable UI lag.
+            \item Developed SQL-driven data validation scripts to cross-reference calculation outputs with UI-rendered engineering results across multiple unit systems, ensuring formula accuracy for Shear Pin Settings, Max Hang Load, and other engineering modules with zero tolerance for rounding discrepancies.
+            \item Queried and analyzed job-creation workflow data through SQL to track completion rates, identify workflow drop-off points in enquiry-import flows, and surface data-quality issues that affected downstream engineering calculations.
+            \item Built and maintained Playwright automation suites covering critical end-to-end workflows -- job setup, enquiry sheet imports, recalculation triggers -- validating that dynamic input changes (TData, Thread Data, Material) propagated correctly through the calculation pipeline without data loss.
+        \end{highlights}
+    \end{onecolentry}
+
+    \vspace{0.3 cm}
+
+    % --- PROJECT: PDSI ---
+    \begin{twocolentry}{
+        \textit{11/2023 -- 08/2024}}
+        \textbf{Automation Data Analyst}
+
+        \textit{Project: PDSI -- AI PPE Detection}
+
+        \textit{Tech Stack: Playwright, SQL, Chrome DevTools, Azure DevOps, Postman}
+    \end{twocolentry}
+
+    \vspace{0.10 cm}
+    \begin{onecolentry}
+        \textit{Project Overview: AI-powered safety monitoring platform that analyzes live streams and uploaded construction videos to detect PPE (Personal Protective Equipment) violations, presenting insights through dashboards, violation timelines, and clip-based evidence.}
+        \begin{highlights}
+            \item Extracted and analyzed violation-trend data from AI-driven dashboards and timeline views, writing SQL queries to validate that backend detection counts matched frontend chart aggregations -- uncovering data-rendering discrepancies in the violation-summary module where displayed counts diverged from actual detection results.
+            \item Validated visual consistency of dashboard, chart, and timeline components across multiple release cycles by capturing Playwright screenshots and systematically comparing rendered outputs against expected baselines, catching rendering regressions introduced by AI model-output changes.
+            \item Verified UI behavior and data display consistency across all user-facing screens, identifying navigation flow issues and usability gaps in the video-review and violation-filtering interfaces that were escalated for UX improvements.
+            \item Analyzed page performance within the violation-review workflow using Chrome DevTools Performance panel and network waterfall analysis, identifying slow-loading clip assets and recommending optimization strategies to improve reviewer workflow efficiency.
+            \item Automated end-to-end data-validation workflows with Playwright covering video review, violation filtering, and result verification -- replacing manual black-box testing with deterministic, data-assertion-driven scripts that substantially reduced regression cycle time.
+        \end{highlights}
+    \end{onecolentry}
+
+    \vspace{0.3 cm}
+
+    % --- PROJECT: FAS5 ---
+    \begin{twocolentry}{
+        \textit{06/2023 -- 10/2023}}
+        \textbf{Automation Data QA}
+
+        \textit{Project: Halliburton -- PowerPlatform Application (FAS5)}
+
+        \textit{Tech Stack: Playwright, SQL Server, Azure DevOps, Microsoft Power Platform}
+    \end{twocolentry}
+
+    \vspace{0.10 cm}
+    \begin{onecolentry}
+        \textit{Project Overview: Enterprise financial exposure management system built on Microsoft Power Platform, enabling role-based workflows (Admin, Contributor, Viewer) for managing exposure records across countries and regions, with ODS-integrated exchange-rate calculations.}
+        \begin{highlights}
+            \item Designed data-extraction workflows using Playwright to crawl and export exposure records, quarter configurations, and audit-history entries from the Power Platform UI into structured datasets -- enabling automated comparison against legacy Talisman migration data and significantly reducing manual verification effort.
+            \item Validated migrated data integrity by programmatically extracting UI-rendered records and diffing them against Excel source files, ensuring that exchange-rate calculations, exposure statuses, and quarter configurations survived the Talisman-to-Power-Platform migration without precision loss.
+            \item Performed API validation to trigger and verify quarter open/close/reminder status flows, confirming that business rules executed correctly across role-based permission boundaries.
+            \item Built Playwright automation suites for role-based CRUD workflows, validating field behaviors, permission boundaries, and audit-trail generation across Admin, Contributor, and Viewer personas.
+        \end{highlights}
+    \end{onecolentry}
+
+    \section{Education}
+
+    \begin{twocolentry}{
+        \textit{2021 -- 2025}}
+        \textbf{University of Information Technology}
+
+        \textit{Major in Computer Engineering}
+    \end{twocolentry}
+
+    \vspace{0.10 cm}
+    \begin{onecolentry}
+        \begin{highlights}
+            \item GPA: 3.2/4.0 (\href{https://drive.google.com/file/d/1jnYJfk6OflRnuUvPbdZEgbYrnKsp1Rm8/view?usp=sharing}{Here})
+        \end{highlights}
+    \end{onecolentry}
+
+\end{document}
