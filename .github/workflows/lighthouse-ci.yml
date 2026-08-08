@@ -44,7 +44,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Project Dependencies
-        run: npm ci || npm install
+        run: npm install
 
       - name: Install Playwright & Chrome Dependencies
         run: npx playwright install --with-deps chromium || true

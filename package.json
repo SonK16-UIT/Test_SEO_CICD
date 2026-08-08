@@ -5,8 +5,8 @@
   "scripts": {
     "explore": "node src/recon/explorer.js",
     "pipeline": "node src/recon/reconToHitl.js",
-    "pipeline:validate": "set VALIDATE_AFTER_EXTRACTION=true&& node src/recon/reconToHitl.js",
-    "pipeline:validate:excel": "set VALIDATE_AFTER_EXTRACTION=true&& set EXPORT_EXCEL_DIR=pages-exploration\\extracted\\excel&& node src/recon/reconToHitl.js",
+    "pipeline:validate": "set VALIDATE_AFTER_EXTRACTION=true && node src/recon/reconToHitl.js",
+    "pipeline:validate:excel": "set VALIDATE_AFTER_EXTRACTION=true && set EXPORT_EXCEL_DIR=pages-exploration\\extracted\\excel && node src/recon/reconToHitl.js",
     "extract-approved": "node src/recon/extractApprovedTasks.js",
     "hitl-server": "node src/hitl/server.js",
     "lint": "eslint \"**/*.{js,ts}\" --quiet",
