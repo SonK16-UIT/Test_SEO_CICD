@@ -12,7 +12,8 @@
     "lint": "eslint \"**/*.{js,ts}\" --quiet",
     "test:lighthouse": "npx playwright test tests/seo/lighthouse.spec.ts --project=chromium",
     "lhci:server": "node src/lhci/server.js",
-    "lhci:wizard": "npx @lhci/cli wizard --serverBaseUrl=http://localhost:9001"
+    "lhci:wizard": "npx @lhci/cli wizard --serverBaseUrl=http://localhost:9001",
+    "postinstall": "npm rebuild sqlite3"
   },
   "keywords": [],
   "author": "",
