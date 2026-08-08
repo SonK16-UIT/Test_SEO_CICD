@@ -34,16 +34,12 @@ createServer({
           externalUrl: 'https://mogi.vn',
           baseBranch: 'main',
         });
-        await storageMethod._sequelize.query(
-          `UPDATE projects SET token = '${FIXED_TOKEN}' WHERE id = '${project.id}'`
-        );
-        console.log(`✅ Auto-seeded project "Test_SEO_CICD" with fixed token: ${FIXED_TOKEN}`);
-      } else {
-        await storageMethod._sequelize.query(
-          `UPDATE projects SET token = '${FIXED_TOKEN}' WHERE id = '${project.id}'`
-        );
-        console.log(`✅ LHCI project "Test_SEO_CICD" ready with fixed token: ${FIXED_TOKEN}`);
       }
+      await storageMethod._sequelize.projectModel.update(
+        { token: FIXED_TOKEN, baseBranch: 'main' },
+        { where: { id: project.id } }
+      );
+      console.log(`✅ LHCI project "Test_SEO_CICD" active with fixed token: ${FIXED_TOKEN}`);
     } catch (err) {
       console.warn('[LHCI Seed Warning]', err.message);
     }
