@@ -36,15 +36,11 @@ module.exports = {
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
       },
     },
-    upload: process.env.LHCI_SERVER_BASE_URL
-      ? {
-          target: 'lhci',
-          serverBaseUrl: process.env.LHCI_SERVER_BASE_URL,
-          token: process.env.LHCI_TOKEN,
-        }
-      : {
-          target: 'filesystem',
-          outputDir: './.lighthouseci',
-        },
+    upload: {
+      target: 'lhci',
+      serverBaseUrl: process.env.LHCI_SERVER_BASE_URL || 'https://test-seo-lhci-server.onrender.com',
+      token: process.env.LHCI_TOKEN || '5bb66e05-ac79-48cc-821e-3386cadf4e1c',
+      outputDir: './.lighthouseci',
+    },
   },
 };
