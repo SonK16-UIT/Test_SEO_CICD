@@ -1,16 +1,19 @@
-# Automated cloud deployment test for Render LHCI server
+# ==============================================================================
+# Lighthouse CI Performance & SEO Audit Workflow
+# Refactored 3-Stage Modular Pipeline Architecture
+# ==============================================================================
 name: Lighthouse CI Performance & SEO Audit
 
 on:
   workflow_dispatch:
     inputs:
       target_url:
-        description: 'Custom Target URL to audit'
+        description: 'Custom Target URL to audit (default: https://mogi.vn)'
         required: false
         default: 'https://mogi.vn'
         type: string
       number_of_runs:
-        description: 'Number of audit runs per URL'
+        description: 'Number of audit runs per URL (1, 3, or 5)'
         required: false
         default: '3'
         type: choice
@@ -25,10 +28,56 @@ permissions:
   statuses: write
 
 jobs:
-  lighthouse-ci:
-    name: Audit & Report Web Performance
+  # ============================================================================
+  # STAGE 1: Setup, Caching & Credential Verification
+  # ============================================================================
+  stage1-setup-and-validate:
+    name: "Stage 1: Setup, Caching & Secret Verification"
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Project Dependencies (Fast CI Mode)
+        run: npm ci || npm install
+
+      - name: Non-Logging Secret Sanity Check
+        env:
+          LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
+          LHCI_SERVER_BASE_URL: ${{ secrets.LHCI_SERVER_BASE_URL }}
+        run: |
+          echo "🔒 Executing non-logging credential verification..."
+          MISSING=0
+          if [ -z "$LHCI_TOKEN" ]; then
+            echo "❌ MISSING SECRET: LHCI_TOKEN is undefined or empty."
+            MISSING=1
+          fi
+          if [ -z "$LHCI_SERVER_BASE_URL" ]; then
+            echo "❌ MISSING SECRET: LHCI_SERVER_BASE_URL is undefined or empty."
+            MISSING=1
+          fi
+          if [ $MISSING -eq 1 ]; then
+            echo "💥 Credential validation failed. Aborting pipeline."
+            exit 1
+          fi
+          echo "✅ Secret sanity check passed. All required credentials present."
+
+  # ============================================================================
+  # STAGE 2: Audit & Performance Testing Execution
+  # ============================================================================
+  stage2-audit-execution:
+    name: "Stage 2: Audit & Performance Execution"
+    needs: stage1-setup-and-validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout Repository
@@ -41,15 +90,13 @@ jobs:
           cache: 'npm'
 
       - name: Install Project Dependencies
-        run: npm install
+        run: npm ci || npm install
 
-      - name: Install Playwright & Chrome Dependencies
-        run: npx playwright install --with-deps chromium || true
-
-      - name: Install Google Chrome Browser
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable || true
+      - name: Restore Browser Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Collect Lighthouse Audit Reports
         id: lhci_collect
@@ -72,34 +119,62 @@ jobs:
             echo "📊 Total files generated: $(ls -1 .lighthouseci/ | wc -l)"
           else
             echo "❌ ERROR: .lighthouseci directory DOES NOT EXIST!"
+            exit 1
           fi
           echo "============================================================"
 
       - name: Evaluate Lighthouse Assertions
         run: npx @lhci/cli assert --config=./lighthouserc.js || true
 
-      - name: Backup Report Files Before Deploy
-        run: |
-          echo "📦 Backing up .lighthouseci/ to /tmp/lhci-backup/ before GitHub Pages deploy..."
-          mkdir -p /tmp/lhci-backup
-          cp -r .lighthouseci/. /tmp/lhci-backup/
-          echo "✅ Backup complete. Files in backup:"
-          ls -la /tmp/lhci-backup/
-
-      - name: Deploy Live Reports to GitHub Pages (Historical Tracking)
+      - name: Upload Raw LHCI Reports Artifact for Stage 3
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lhci-raw-reports-${{ github.run_id }}
+          path: .lighthouseci/
+          retention-days: 1
+
+  # ============================================================================
+  # STAGE 3: Multi-Channel Reporting & Artifact Publishing
+  # ============================================================================
+  stage3-report-and-publish:
+    name: "Stage 3: Multi-Channel Reporting & Publishing"
+    needs: stage2-audit-execution
+    if: always() && needs.stage2-audit-execution.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Project Dependencies
+        run: npm ci || npm install
+
+      - name: Download Raw LHCI Reports Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lhci-raw-reports-${{ github.run_id }}
+          path: .lighthouseci
+
+      - name: Deploy Live Reports to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: /tmp/lhci-backup
+          folder: .lighthouseci
           target-folder: reports/${{ github.run_id }}
           clean: false
 
-      - name: Upload Lighthouse Reports Artifact
+      - name: Upload Final ZIP Artifact Package
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: lhci-reports-${{ github.run_id }}
-          path: /tmp/lhci-backup/
+          path: .lighthouseci/
           retention-days: 30
 
       # ── Tab 1: Commit Tracking (1 build per Git SHA — 422 on re-run = ignored) ──
@@ -124,7 +199,6 @@ jobs:
           npx @lhci/cli upload --config=./lighthouserc.js || true
 
       - name: Generate Markdown Job Summary
-        if: always()
         run: |
           echo "## 🚀 Lighthouse CI Audit Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -140,4 +214,4 @@ jobs:
           echo "👉 https://SonK16-UIT.github.io/Test_SEO_CICD/reports/${{ github.run_id }}/" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📦 Artifact Downloads" >> $GITHUB_STEP_SUMMARY
-          echo "Full raw HTML and JSON audit files are also available in the workflow download section below." >> $GITHUB_STEP_SUMMARY
+          echo "Full raw HTML and JSON audit files are available in the workflow download section below." >> $GITHUB_STEP_SUMMARY
