@@ -161,4 +161,101 @@ document.addEventListener('DOMContentLoaded', () => {
       contactForm.reset();
     });
   }
+  // 5. Debounced Search Telemetry Tracking (500ms Debounce / Enter Submit)
+  // =========================================================================
+  const searchInput = document.getElementById('search-input');
+  const searchClear = document.getElementById('search-clear');
+  let searchTimer = null;
+  let lastTrackedQuery = '';
+
+  function triggerSearchTelemetry(query, triggerSource) {
+    const trimmed = query.trim();
+    if (trimmed.length < 3 || trimmed === lastTrackedQuery) return;
+
+    lastTrackedQuery = trimmed;
+
+    if (typeof posthog !== 'undefined') {
+      // [PostHog Capture] Search Executed Event
+      posthog.capture('search_executed', {
+        search_query: trimmed,
+        query_length: trimmed.length,
+        trigger_source: triggerSource,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    appendLog(`🔍 <strong style="color: #a855f7;">Search Captured (${triggerSource}):</strong> <code>${trimmed}</code>`);
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const value = e.target.value;
+      if (searchClear) {
+        if (value.length > 0) searchClear.classList.add('visible');
+        else searchClear.classList.remove('visible');
+      }
+
+      if (searchTimer) clearTimeout(searchTimer);
+
+      if (value.trim().length >= 3) {
+        searchTimer = setTimeout(() => {
+          triggerSearchTelemetry(value, 'debounce_timeout');
+        }, 500);
+      }
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (searchTimer) clearTimeout(searchTimer);
+        triggerSearchTelemetry(searchInput.value, 'enter_key_submit');
+      }
+    });
+  }
+
+  if (searchClear && searchInput) {
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchClear.classList.remove('visible');
+      lastTrackedQuery = '';
+      if (searchTimer) clearTimeout(searchTimer);
+    });
+  }
+
+  // =========================================================================
+  // 6. Intentional Hover Dwell Tracking (>1.5s Dwell Threshold)
+  // =========================================================================
+  const productCards = document.querySelectorAll('.product-card');
+  productCards.forEach(card => {
+    let dwellTimer = null;
+    const planBtn = card.querySelector('.select-plan-btn');
+    const planName = planBtn ? planBtn.getAttribute('data-ph-capture-attribute-plan') : 'product';
+    const cardTitle = card.querySelector('.product-title')?.innerText || planName;
+
+    card.addEventListener('pointerenter', () => {
+      if (dwellTimer) clearTimeout(dwellTimer);
+
+      dwellTimer = setTimeout(() => {
+        if (typeof posthog !== 'undefined') {
+          // [PostHog Capture] Hover Dwell Event (>1.5s)
+          posthog.capture('product_card_dwelled', {
+            card_id: planName,
+            card_title: cardTitle,
+            dwell_threshold_ms: 1500,
+            timestamp: new Date().toISOString()
+          });
+        }
+        appendLog(`⏱️ <strong style="color: #f59e0b;">Hover Dwell Captured (>1.5s):</strong> <code>${cardTitle}</code>`);
+      }, 1500);
+    });
+
+    const cancelDwell = () => {
+      if (dwellTimer) {
+        clearTimeout(dwellTimer);
+        dwellTimer = null;
+      }
+    };
+
+    card.addEventListener('pointerleave', cancelDwell);
+    card.addEventListener('pointercancel', cancelDwell);
+  });
 });
