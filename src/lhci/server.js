@@ -23,6 +23,7 @@ const storageConfig = DATABASE_URL
       sqlConnectionUrl: DATABASE_URL,
       sqlDialectOptions: {
         ssl: { rejectUnauthorized: false }, // Required for Render PostgreSQL
+        searchPath: 'lhci_schema',
       },
     }
   : {
