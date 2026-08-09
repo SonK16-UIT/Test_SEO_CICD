@@ -46,7 +46,7 @@ module.exports = {
     upload: {
       target: 'lhci',
       serverBaseUrl: process.env.LHCI_SERVER_BASE_URL || 'https://test-seo-lhci-server.onrender.com',
-      token: process.env.LHCI_TOKEN || '5bb66e05-ac79-48cc-821e-3386cadf4e1c',
+      token: process.env.LHCI_TOKEN,
       outputDir: './.lighthouseci',
     },
   },

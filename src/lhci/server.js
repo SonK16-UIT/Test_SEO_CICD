@@ -11,10 +11,10 @@ const path = require('path');
 const port = process.env.PORT || 9001;
 const DATABASE_URL = process.env.DATABASE_URL;
 
-// Tokens
-const LHCI_CICD_TOKEN   = '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
-const LHCI_MANUAL_TOKEN = 'b4c49f2e-7152-4102-b60c-4316b7d79874';
-const ADMIN_TOKEN       = '53807583ee4af9454e596001d60aac7a3282be0d08fbb97a399f5c4659074bfe';
+// Tokens (overridable via Render Environment Variables)
+const LHCI_CICD_TOKEN   = process.env.LHCI_CICD_TOKEN   || '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
+const LHCI_MANUAL_TOKEN = process.env.LHCI_MANUAL_TOKEN || 'b4c49f2e-7152-4102-b60c-4316b7d79874';
+const ADMIN_TOKEN       = process.env.LHCI_ADMIN_TOKEN  || '53807583ee4af9454e596001d60aac7a3282be0d08fbb97a399f5c4659074bfe';
 
 // Storage config — PostgreSQL in prod, SQLite locally
 const storageConfig = DATABASE_URL
