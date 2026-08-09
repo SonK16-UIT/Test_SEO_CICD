@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PostHog Analytics Demo | GitHub Pages Deployment</title>
-  <meta name="description" content="Production static website demo with integrated PostHog analytics and event tracking hosted on GitHub Pages.">
+  <meta name="description"
+    content="Production static website demo with integrated PostHog analytics and event tracking hosted on GitHub Pages.">
   <link rel="stylesheet" href="css/style.css">
 
   <!-- PostHog Analytics Integration Snippet -->
   <script>
-    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}Array.isArray(s)?s.forEach(function(t){g(e,t)}):g(e,s),e._i.push([i,a,e])},e.__SV=1.0,o=t.createElement("script"),o.type="text/javascript",o.async=!0,o.src=a.api_host+"/static/array.js",(n=t.getElementsByTagName("script")[0]).parentNode.insertBefore(o,n))}(document,window.posthog||[]);
-    
+    !function (t, e) { var o, n, p, r; e.__SV || (window.posthog = e, e._i = [], e.init = function (i, s, a) { function g(t, e) { var o = e.split("."); 2 == o.length && (t = t[o[0]], e = o[1]), t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } } Array.isArray(s) ? s.forEach(function (t) { g(e, t) }) : g(e, s), e._i.push([i, a, e]) }, e.__SV = 1.0, o = t.createElement("script"), o.type = "text/javascript", o.async = !0, o.src = a.api_host + "/static/array.js", (n = t.getElementsByTagName("script")[0]).parentNode.insertBefore(o, n)) }(document, window.posthog || []);
+
     // REPLACE 'YOUR_POSTHOG_API_KEY' WITH YOUR ACTUAL POSTHOG PROJECT API KEY (phc_...)
-    posthog.init('YOUR_POSTHOG_API_KEY', {
+    posthog.init('phc_tYsqFZqJfChiVKhyHaMuQ7wsATe5fKWj6BjKSMETiMbV', {
       api_host: 'https://us.i.posthog.com', // Or 'https://eu.i.posthog.com' for EU Cloud
-      person_profiles: 'identified_only',
+      person_profiles: 'always',
       capture_pageview: true,
       capture_pageleave: true
     });
   </script>
 </head>
+
 <body>
 
   <main class="hero-card">
@@ -57,4 +60,5 @@
 
   <script src="js/app.js"></script>
 </body>
+
 </html>
