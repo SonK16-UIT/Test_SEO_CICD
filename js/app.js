@@ -1,3 +1,4 @@
+/* global posthog */
 /**
  * PostHog Interactive Event Tracking Demo App
  */
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timestamp: new Date().toISOString()
       };
 
-      if (window.posthog) {
+      if (typeof posthog !== 'undefined') {
         posthog.capture('cta_button_clicked', eventProperties);
         appendLog('🚀 <strong style="color: #6366f1;">Captured Event:</strong> <code>cta_button_clicked</code>', 'success');
       } else {
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timestamp: new Date().toISOString()
       };
 
-      if (window.posthog) {
+      if (typeof posthog !== 'undefined') {
         posthog.capture('newsletter_subscribed', eventProperties);
         appendLog('🎉 <strong style="color: #10b981;">Captured Event:</strong> <code>newsletter_subscribed</code>', 'success');
       } else {
