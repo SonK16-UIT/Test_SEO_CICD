@@ -11,10 +11,9 @@ const path = require('path');
 const port = process.env.PORT || 9001;
 const DATABASE_URL = process.env.DATABASE_URL;
 
-// Tokens (overridable via Render Environment Variables)
-const LHCI_CICD_TOKEN   = process.env.LHCI_CICD_TOKEN   || '5bb66e05-ac79-48cc-821e-3386cadf4e1c';
-const LHCI_MANUAL_TOKEN = process.env.LHCI_MANUAL_TOKEN || 'b4c49f2e-7152-4102-b60c-4316b7d79874';
-const ADMIN_TOKEN       = process.env.LHCI_ADMIN_TOKEN  || '53807583ee4af9454e596001d60aac7a3282be0d08fbb97a399f5c4659074bfe';
+// Read project build tokens strictly from environment variables (Zero hardcoded secrets)
+const LHCI_CICD_TOKEN   = process.env.LHCI_CICD_TOKEN;
+const LHCI_MANUAL_TOKEN = process.env.LHCI_MANUAL_TOKEN;
 
 // Storage config — PostgreSQL in prod, SQLite locally
 const storageConfig = DATABASE_URL
@@ -85,7 +84,7 @@ const DARK_MODE_CSS = `
 </style>
 `;
 
-// Seed a single project (only creates if missing, only updates its own token)
+// Seed a single project (only creates if missing, updates token only if explicitly passed via env)
 async function seedProject(storageMethod, { name, slug, token }) {
   const projects = await storageMethod.getProjects();
   let project = projects.find(p => p.name === name);
@@ -98,19 +97,21 @@ async function seedProject(storageMethod, { name, slug, token }) {
     });
     console.log(`✅ Created project "${name}"`);
   } else {
-    console.log(`ℹ️  Project "${name}" already exists — skipping creation`);
+    console.log(`ℹ️  Project "${name}" already exists`);
   }
 
-  // Update only this project's build token (adminToken column does not exist in PostgreSQL schema)
-  const sequelize = storageMethod._sequelize.sequelize;
-  await sequelize.query(
-    `UPDATE projects SET token = :token WHERE id = :id`,
-    {
-      replacements: { token, id: project.id },
-      type: sequelize.QueryTypes.UPDATE,
-    }
-  );
-  console.log(`🔑 Token synced for "${name}": ${token}`);
+  // Update build token if explicitly configured in environment variables
+  if (token) {
+    const sequelize = storageMethod._sequelize.sequelize;
+    await sequelize.query(
+      `UPDATE projects SET token = :token WHERE id = :id`,
+      {
+        replacements: { token: token.trim(), id: project.id },
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+    console.log(`🔑 Build token synced for "${name}": [SECURELY_SET]`);
+  }
 }
 
 createApp({
@@ -151,7 +152,7 @@ createApp({
           token: LHCI_MANUAL_TOKEN,
         });
 
-        console.log('🎉 All projects seeded successfully.');
+        console.log('🎉 Project initialization complete.');
       } catch (err) {
         console.error('[LHCI Seed Error]', err.message);
       }
