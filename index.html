@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PostHog Analytics Demo | GitHub Pages Deployment</title>
+  <title>PostHog SPA Analytics & Telemetry Demo | GitHub Pages</title>
   <meta name="description"
-    content="Production static website demo with integrated PostHog analytics and event tracking hosted on GitHub Pages.">
+    content="Production SPA landing page demo with PostHog analytics tab switching, product tracking, form capture, and session replay.">
   <link rel="stylesheet" href="css/style.css">
 
   <!-- PostHog Analytics Integration Snippet (Latest Official) -->
@@ -24,33 +24,175 @@
 
 <body>
 
-  <main class="hero-card">
-    <div class="badge">
-      <span class="badge-dot"></span>
-      GitHub Pages & PostHog Live Demo
-    </div>
-
-    <h1>User Event Analytics Test</h1>
-    <p class="subtitle">Test custom event tracking, page views, and session recordings in real-time.</p>
-
-    <div class="interactive-grid">
-      <button id="btn-cta" class="action-btn primary">
-        <span>⚡ Test CTA Event</span>
+  <!-- Navigation Tab Bar -->
+  <header class="nav-header">
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="overview">
+        <span>🏠 Overview</span>
       </button>
-      <button id="btn-subscribe" class="action-btn secondary">
-        <span>🎉 Subscribe Event</span>
+      <button class="tab-btn" data-tab="products">
+        <span>📦 Products & Pricing</span>
       </button>
-    </div>
+      <button class="tab-btn" data-tab="contact">
+        <span>💬 Support & Contact</span>
+      </button>
+    </nav>
+  </header>
 
+  <!-- Main Card Container -->
+  <main class="main-card">
+
+    <!-- =================================================================== -->
+    <!-- TAB 1: OVERVIEW -->
+    <!-- =================================================================== -->
+    <section id="tab-overview" class="tab-content active">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Live PostHog Telemetry Connected
+      </div>
+
+      <h1>Conversion Landing Page & Tracking Demo</h1>
+      <p class="subtitle">Test tab navigation, product interactions, form submissions, and session replay in real-time.</p>
+
+      <div class="interactive-grid">
+        <button id="btn-cta" class="action-btn primary">
+          <span>⚡ Test Primary Hero CTA</span>
+        </button>
+        <button id="btn-subscribe" class="action-btn secondary">
+          <span>🎉 Test Newsletter Event</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 2: PRODUCTS SHOWCASE -->
+    <!-- =================================================================== -->
+    <section id="tab-products" class="tab-content">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Product Interaction Analytics
+      </div>
+
+      <h1>Choose Your Growth Plan</h1>
+      <p class="subtitle">Select a plan to trigger custom product selection telemetry events in PostHog.</p>
+
+      <div class="products-grid">
+        <!-- Plan 1: Starter -->
+        <div class="product-card">
+          <div>
+            <div class="product-title">Starter Developer</div>
+            <div class="product-price">$29 <span>/month</span></div>
+            <ul class="product-features">
+              <li>✓ Up to 10k Monthly Events</li>
+              <li>✓ Basic Web Vitals Tracking</li>
+              <li>✓ 7-Day Session Replay</li>
+            </ul>
+          </div>
+          <button class="action-btn primary select-plan-btn"
+                  data-ph-capture-attribute-plan="starter"
+                  data-ph-capture-attribute-price="29">
+            Select Starter Plan
+          </button>
+        </div>
+
+        <!-- Plan 2: Pro Growth (Featured) -->
+        <div class="product-card featured">
+          <div class="product-badge">POPULAR</div>
+          <div>
+            <div class="product-title">Pro Growth Engine</div>
+            <div class="product-price">$79 <span>/month</span></div>
+            <ul class="product-features">
+              <li>✓ Up to 100k Monthly Events</li>
+              <li>✓ Full Funnels & Cohorts</li>
+              <li>✓ 30-Day Session Replay</li>
+              <li>✓ Priority Support</li>
+            </ul>
+          </div>
+          <button class="action-btn primary select-plan-btn"
+                  data-ph-capture-attribute-plan="pro"
+                  data-ph-capture-attribute-price="79">
+            Select Pro Growth Plan
+          </button>
+        </div>
+
+        <!-- Plan 3: Enterprise -->
+        <div class="product-card">
+          <div>
+            <div class="product-title">Enterprise Scale</div>
+            <div class="product-price">$199 <span>/month</span></div>
+            <ul class="product-features">
+              <li>✓ Unlimited Telemetry Events</li>
+              <li>✓ Custom Data Retention</li>
+              <li>✓ Dedicated SLA & Manager</li>
+            </ul>
+          </div>
+          <button class="action-btn secondary select-plan-btn"
+                  data-ph-capture-attribute-plan="enterprise"
+                  data-ph-capture-attribute-price="199">
+            Contact Enterprise
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 3: SUPPORT & CONTACT -->
+    <!-- =================================================================== -->
+    <section id="tab-contact" class="tab-content">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Lead Capture & Identity Resolution
+      </div>
+
+      <h1>Contact Support & Sales</h1>
+      <p class="subtitle">Submit this form to test PostHog User Identification (posthog.identify) and lead capture telemetry.</p>
+
+      <form id="contact-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="contact-name">Your Full Name *</label>
+            <input type="text" id="contact-name" class="input-control" placeholder="Alex Morgan" required>
+          </div>
+
+          <div class="form-group">
+            <label for="contact-email">Business Email *</label>
+            <input type="email" id="contact-email" class="input-control" placeholder="alex@company.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="contact-topic">Inquiry Topic</label>
+          <select id="contact-topic" class="input-control">
+            <option value="General Inquiry">General Product Inquiry</option>
+            <option value="Enterprise Sales">Enterprise Plan Upgrade</option>
+            <option value="PostHog Integration">PostHog Integration Help</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="contact-message">Your Message *</label>
+          <textarea id="contact-message" class="input-control" placeholder="How can we help you scale analytics?" required></textarea>
+        </div>
+
+        <button type="submit" id="contact-submit" class="action-btn primary">
+          <span>🚀 Submit & Identify User</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- LIVE CLIENT DISPATCH CONSOLE -->
+    <!-- =================================================================== -->
     <div class="console-box">
       <div class="console-header">
-        <span>LIVE EVENT FEED</span>
-        <span>CLIENT DISPATCH</span>
+        <span>LIVE CLIENT TELEMETRY FEED</span>
+        <span>POSTHOG DISPATCH</span>
       </div>
       <div id="console-output" class="console-log">
-        <!-- Live event logs will appear here -->
+        <!-- Real-time event log entries -->
       </div>
     </div>
+
   </main>
 
   <footer>
