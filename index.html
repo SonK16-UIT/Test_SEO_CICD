@@ -11,11 +11,10 @@
 
   <!-- PostHog Analytics Integration Snippet -->
   <script>
-    !function (t, e) { var o, n, p, r; e.__SV || (window.posthog = e, e._i = [], e.init = function (i, s, a) { function g(t, e) { var o = e.split("."); 2 == o.length && (t = t[o[0]], e = o[1]), t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } } Array.isArray(s) ? s.forEach(function (t) { g(e, t) }) : g(e, s), e._i.push([i, a, e]) }, e.__SV = 1.0, o = t.createElement("script"), o.type = "text/javascript", o.async = !0, o.src = a.api_host + "/static/array.js", (n = t.getElementsByTagName("script")[0]).parentNode.insertBefore(o, n)) }(document, window.posthog || []);
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}var m=e;for(void 0!==a?m=e[a]=[]:a="posthog",m.people=m.people||[],m.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},m.people.toString=function(){return m.toString(1)+".people (stub)"},p="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing opt_in_capturing has_opted_out_capturing has_opted_in_capturing clear isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group resetGroup setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_out_capturing opt_in_capturing has_opted_out_capturing has_opted_in_capturing clear".split(" "),r=0;r<p.length;r++)g(m,p[r]);e._i.push([i,s,a]);o=t.createElement("script");o.type="text/javascript";o.crossOrigin="anonymous";o.async=!0;o.src=s.api_host+"/static/array.js";(n=t.getElementsByTagName("script")[0]).parentNode.insertBefore(o,n)},e.__SV=1.0)}(document,window.posthog||[]);
 
-    // REPLACE 'YOUR_POSTHOG_API_KEY' WITH YOUR ACTUAL POSTHOG PROJECT API KEY (phc_...)
     posthog.init('phc_tYsqFZqJfChiVKhyHaMuQ7wsATe5fKWj6BjKSMETiMbV', {
-      api_host: 'https://us.i.posthog.com', // Or 'https://eu.i.posthog.com' for EU Cloud
+      api_host: 'https://us.i.posthog.com',
       person_profiles: 'always',
       capture_pageview: true,
       capture_pageleave: true
