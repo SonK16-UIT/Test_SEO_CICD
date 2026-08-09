@@ -3,6 +3,7 @@ from urllib.parse import urljoin, urlparse, parse_qs
 from scrapy_playwright.page import PageMethod
 from scrapy_mogi.items import MogiListingItem
 from scrapy_mogi.page_objects.mogi_listing import MogiListingPage
+from scrapy_mogi.posthog_client import posthog_client
 
 
 class MogiSpider(scrapy.Spider):
@@ -15,6 +16,11 @@ class MogiSpider(scrapy.Spider):
         print("--- DEBUG: start_requests CALLED ---")
         self.logger.info("--- DEBUG: start_requests CALLED ---")
         max_pages = int(getattr(self, 'max_pages', self.max_pages))
+        if posthog_client:
+            posthog_client.capture(
+                event='listing_crawl_started',
+                properties={'max_pages': max_pages},
+            )
         for page in range(1, max_pages + 1):
             url = f'https://mogi.vn/mua-nha-dat?cp={page}'
             self.logger.info(f"--- DEBUG: start_requests yielding: {url} ---")
@@ -49,6 +55,14 @@ class MogiSpider(scrapy.Spider):
                 page_num = None
 
         listing_selectors = response.css('div.property-listing ul > li')
+        if posthog_client:
+            posthog_client.capture(
+                event='listing_page_parsed',
+                properties={
+                    'page_number': page_num,
+                    'listing_count': len(listing_selectors),
+                },
+            )
         for selector in listing_selectors:
             page = MogiListingPage(selector)
             item = MogiListingItem()
