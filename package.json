@@ -42,6 +42,7 @@
     "playwright": "^1.62.1",
     "playwright-extra": "^4.3.6",
     "playwright-extra-plugin-stealth": "^0.0.1",
+    "posthog-js": "^1.414.0",
     "proxy-chain": "^3.0.0",
     "sqlite3": "^6.0.1",
     "uuid": "^14.0.1"
