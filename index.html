@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PostHog SPA Analytics & Telemetry Demo | GitHub Pages</title>
+  <meta name="description"
+    content="Production SPA landing page demo with PostHog analytics tab switching, product tracking, form capture, and session replay.">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- PostHog Analytics Integration Snippet (Latest Official) -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}p||((p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",p.onerror=function(){p=null},(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r));var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="an ln init xn Cn Br kn In capture Fn nn calculateEventProperties On register register_once register_for_session unregister unregister_for_session Ln getFeatureFlag getFeatureFlagPayload getFeatureFlagResult getAllFeatureFlags isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync Dn identify setPersonProperties unsetPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset shutdown setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty An Rn createPersonProfile setInternalOrTestUser $n yn jn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Tn debug Ur Rt getPageViewId captureTraceFeedback captureTraceMetric pn".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_tYsqFZqJfChiVKhyHaMuQ7wsATe5fKWj6BjKSMETiMbV', {
+      api_host: 'https://us.i.posthog.com',
+      defaults: '2026-05-30',
+      person_profiles: 'always',
+      capture_pageview: true,
+      capture_pageleave: true
+    });
+  </script>
+</head>
+
+<body>
+
+  <!-- Navigation Tab Bar -->
+  <header class="nav-header">
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="overview">
+        <span>🏠 Overview</span>
+      </button>
+      <button class="tab-btn" data-tab="products">
+        <span>📦 Products & Pricing</span>
+      </button>
+      <button class="tab-btn" data-tab="contact">
+        <span>💬 Support & Contact</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main Card Container -->
+  <main class="main-card">
+
+    <!-- =================================================================== -->
+    <!-- TAB 1: OVERVIEW -->
+    <!-- =================================================================== -->
+    <section id="tab-overview" class="tab-content active">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Live PostHog Telemetry Connected
+      </div>
+
+      <h1>Conversion Landing Page & Tracking Demo</h1>
+      <p class="subtitle">Test tab navigation, product interactions, form submissions, and session replay in real-time.</p>
+
+      <div class="interactive-grid">
+        <button id="btn-cta" class="action-btn primary">
+          <span>⚡ Test Primary Hero CTA</span>
+        </button>
+        <button id="btn-subscribe" class="action-btn secondary">
+          <span>🎉 Test Newsletter Event</span>
+        </button>
+      </div>
+
+      <!-- 500ms Debounced Telemetry Search Input Component -->
+      <div class="search-container">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="search" id="search-input" class="search-control" placeholder="Search features, plans, or documentation... (500ms debounce)" aria-label="Search with automated PostHog telemetry">
+          <button id="search-clear" class="search-clear-btn" aria-label="Clear search">✕</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 2: PRODUCTS SHOWCASE -->
+    <!-- =================================================================== -->
+    <section id="tab-products" class="tab-content">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Product Interaction Analytics
+      </div>
+
+      <h1>Choose Your Growth Plan</h1>
+      <p class="subtitle">Select a plan to trigger custom product selection telemetry events in PostHog.</p>
+
+      <div class="products-grid">
+        <!-- Plan 1: Starter -->
+        <div class="product-card">
+          <div>
+            <div class="product-title">Starter Developer</div>
+            <div class="product-price">$29 <span>/month</span></div>
+            <ul class="product-features">
+              <li>✓ Up to 10k Monthly Events</li>
+              <li>✓ Basic Web Vitals Tracking</li>
+              <li>✓ 7-Day Session Replay</li>
+            </ul>
+          </div>
+          <button class="action-btn primary select-plan-btn"
+                  data-ph-capture-attribute-plan="starter"
+                  data-ph-capture-attribute-price="29">
+            Select Starter Plan
+          </button>
+        </div>
+
+        <!-- Plan 2: Pro Growth (Featured) -->
+        <div class="product-card featured">
+          <div class="product-badge">POPULAR</div>
+          <div>
+            <div class="product-title">Pro Growth Engine</div>
+            <div class="product-price">$79 <span>/month</span></div>
+            <ul class="product-features">
+              <li>✓ Up to 100k Monthly Events</li>
+              <li>✓ Full Funnels & Cohorts</li>
+              <li>✓ 30-Day Session Replay</li>
+              <li>✓ Priority Support</li>
+            </ul>
+          </div>
+          <button class="action-btn primary select-plan-btn"
+                  data-ph-capture-attribute-plan="pro"
+                  data-ph-capture-attribute-price="79">
+            Select Pro Growth Plan
+          </button>
+        </div>
+
+        <!-- Plan 3: Enterprise -->
+        <div class="product-card">
+          <div>
+            <div class="product-title">Enterprise Scale</div>
+            <div class="product-price">$199 <span>/month</span></div>
+            <ul class="product-features">
+              <li>✓ Unlimited Telemetry Events</li>
+              <li>✓ Custom Data Retention</li>
+              <li>✓ Dedicated SLA & Manager</li>
+            </ul>
+          </div>
+          <button class="action-btn secondary select-plan-btn"
+                  data-ph-capture-attribute-plan="enterprise"
+                  data-ph-capture-attribute-price="199">
+            Contact Enterprise
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 3: SUPPORT & CONTACT -->
+    <!-- =================================================================== -->
+    <section id="tab-contact" class="tab-content">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Lead Capture & Identity Resolution
+      </div>
+
+      <h1>Contact Support & Sales</h1>
+      <p class="subtitle">Submit this form to test PostHog User Identification (posthog.identify) and lead capture telemetry.</p>
+
+      <form id="contact-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="contact-name">Your Full Name *</label>
+            <input type="text" id="contact-name" class="input-control" placeholder="Alex Morgan" required>
+          </div>
+
+          <div class="form-group">
+            <label for="contact-email">Business Email *</label>
+            <input type="email" id="contact-email" class="input-control" placeholder="alex@company.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="contact-topic">Inquiry Topic</label>
+          <select id="contact-topic" class="input-control">
+            <option value="General Inquiry">General Product Inquiry</option>
+            <option value="Enterprise Sales">Enterprise Plan Upgrade</option>
+            <option value="PostHog Integration">PostHog Integration Help</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="contact-message">Your Message *</label>
+          <textarea id="contact-message" class="input-control" placeholder="How can we help you scale analytics?" required></textarea>
+        </div>
+
+        <button type="submit" id="contact-submit" class="action-btn primary">
+          <span>🚀 Submit & Identify User</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- LIVE CLIENT DISPATCH CONSOLE -->
+    <!-- =================================================================== -->
+    <div class="console-box">
+      <div class="console-header">
+        <span>LIVE CLIENT TELEMETRY FEED</span>
+        <span>POSTHOG DISPATCH</span>
+      </div>
+      <div id="console-output" class="console-log">
+        <!-- Real-time event log entries -->
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    Deployed via GitHub Actions & GitHub Pages
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+
+</html>

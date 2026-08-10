@@ -3,6 +3,7 @@ from typing import Dict, Any
 import pandas as pd
 from openpyxl.utils import get_column_letter
 from scrapy.exceptions import DropItem
+from scrapy_mogi.posthog_client import posthog_client
 
 
 class ExcelExportPipeline:
@@ -40,3 +41,8 @@ class ExcelExportPipeline:
                 worksheet.column_dimensions[get_column_letter(idx)].width = min(column_length, 60)
 
         spider.logger.info('Wrote %d listings to Excel: %s', len(self.records), self.output_path)
+        if posthog_client:
+            posthog_client.capture(
+                event='listing_export_completed',
+                properties={'listing_count': len(self.records)},
+            )

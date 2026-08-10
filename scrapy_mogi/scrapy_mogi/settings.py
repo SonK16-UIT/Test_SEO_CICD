@@ -1,3 +1,6 @@
+from scrapy_mogi.posthog_client import posthog_client
+
+
 BOT_NAME = 'scrapy_mogi'
 
 SPIDER_MODULES = ['scrapy_mogi.spiders']

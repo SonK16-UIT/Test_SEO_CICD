@@ -29,6 +29,7 @@ function loadState() {
 
 async function pollForApproval(taskId) {
   const start = Date.now();
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const state = loadState();
     const currentTask = state.tasks.find((item) => item.taskId === taskId);
